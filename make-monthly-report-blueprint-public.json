@@ -1,0 +1,1931 @@
+{
+  "name": "학습레포트 자동화",
+  "flow": [
+    {
+      "id": 2,
+      "module": "google-drive:watchFilesInAFolder",
+      "version": 4,
+      "parameters": {
+        "limit": 1,
+        "select": "create",
+        "folderId": "/REDACTED_INPUT_FOLDER_ID",
+        "mimeType": "spreadsheet",
+        "__IMTCONN__": 0,
+        "destination": "drive"
+      },
+      "mapper": {},
+      "metadata": {
+        "designer": {
+          "x": -24,
+          "y": 23
+        },
+        "restore": {
+          "parameters": {
+            "select": {
+              "label": "By Created Time"
+            },
+            "folderId": {
+              "path": [
+                "학생 데이터"
+              ]
+            },
+            "mimeType": {
+              "label": "Google Spreadsheets"
+            },
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google-drive"
+              },
+              "label": "REDACTED Google Drive connection"
+            },
+            "destination": {
+              "label": "My Drive"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google-restricted,google-drive",
+            "label": "Connection",
+            "required": true
+          },
+          {
+            "name": "select",
+            "type": "select",
+            "label": "Watch Files",
+            "required": true,
+            "validate": {
+              "enum": [
+                "create",
+                "modify"
+              ]
+            }
+          },
+          {
+            "name": "destination",
+            "type": "select",
+            "label": "Choose a Drive",
+            "required": true,
+            "validate": {
+              "enum": [
+                "drive",
+                "share",
+                "team"
+              ]
+            }
+          },
+          {
+            "name": "mimeType",
+            "type": "select",
+            "label": "File Types to Watch",
+            "required": true,
+            "validate": {
+              "enum": [
+                "all",
+                "document",
+                "spreadsheet",
+                "slide",
+                "drawing"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "type": "uinteger",
+            "label": "Limit",
+            "required": true
+          },
+          {
+            "name": "folderId",
+            "type": "folder",
+            "label": "Select the Folder to be Watched",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "google-sheets:getSheetContent",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "range": "A2:C5",
+        "select": "fromAll",
+        "sheetId": "설정",
+        "spreadsheetId": "{{2.id}}",
+        "tableFirstRow": "1",
+        "includesHeaders": true,
+        "valueRenderOption": "FORMATTED_VALUE",
+        "dateTimeRenderOption": "FORMATTED_STRING"
+      },
+      "metadata": {
+        "designer": {
+          "x": 265,
+          "y": 4
+        },
+        "restore": {
+          "expect": {
+            "select": {
+              "label": "Select from all"
+            },
+            "sheetId": {
+              "mode": "edit"
+            },
+            "includesHeaders": {
+              "mode": "chose"
+            },
+            "valueRenderOption": {
+              "mode": "chose",
+              "label": "Formatted value"
+            },
+            "dateTimeRenderOption": {
+              "mode": "chose",
+              "label": "Formatted string"
+            }
+          },
+          "parameters": {
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google"
+              },
+              "label": "REDACTED Google connection"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google",
+            "label": "Connection",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "select",
+            "type": "select",
+            "label": "Search Method",
+            "required": true,
+            "validate": {
+              "enum": [
+                "list",
+                "fromAll",
+                "map"
+              ]
+            }
+          },
+          {
+            "name": "range",
+            "type": "text",
+            "label": "Range",
+            "required": true
+          },
+          {
+            "name": "includesHeaders",
+            "type": "boolean",
+            "label": "Table contains headers",
+            "required": true
+          },
+          {
+            "name": "valueRenderOption",
+            "type": "select",
+            "label": "Value render option",
+            "validate": {
+              "enum": [
+                "FORMATTED_VALUE",
+                "UNFORMATTED_VALUE",
+                "FORMULA"
+              ]
+            }
+          },
+          {
+            "name": "dateTimeRenderOption",
+            "type": "select",
+            "label": "Date and time render option",
+            "validate": {
+              "enum": [
+                "SERIAL_NUMBER",
+                "FORMATTED_STRING"
+              ]
+            }
+          },
+          {
+            "name": "spreadsheetId",
+            "type": "text",
+            "label": "Spreadsheet ID",
+            "required": true
+          },
+          {
+            "mode": "edit",
+            "name": "sheetId",
+            "type": "select",
+            "label": "Sheet Name",
+            "required": true
+          },
+          {
+            "name": "tableFirstRow",
+            "type": "text",
+            "label": "Row with headers"
+          }
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "module": "util:SetVariables",
+      "version": 1,
+      "parameters": {},
+      "filter": null,
+      "mapper": {
+        "scope": "roundtrip",
+        "variables": [
+          {
+            "name": "subject",
+            "value": "{{trim(3.`0`)}}"
+          },
+          {
+            "name": "currentUnit",
+            "value": "{{trim(3.`1`)}}"
+          },
+          {
+            "name": "newUnit",
+            "value": "{{trim(3.`2`)}}"
+          }
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 588,
+          "y": 9
+        },
+        "restore": {
+          "expect": {
+            "scope": {
+              "label": "One cycle"
+            },
+            "variables": {
+              "items": [
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        },
+        "expect": [
+          {
+            "name": "variables",
+            "spec": {
+              "name": "value",
+              "spec": [
+                {
+                  "name": "name",
+                  "type": "text",
+                  "label": "Variable name",
+                  "required": true
+                },
+                {
+                  "name": "value",
+                  "type": "any",
+                  "label": "Variable value"
+                }
+              ],
+              "type": "collection",
+              "label": "Variable"
+            },
+            "type": "array",
+            "label": "Variables",
+            "validate": {
+              "unique": {
+                "by": "name"
+              }
+            }
+          },
+          {
+            "name": "scope",
+            "type": "select",
+            "label": "Variable lifetime",
+            "required": true,
+            "validate": {
+              "enum": [
+                "roundtrip",
+                "execution"
+              ]
+            }
+          }
+        ],
+        "interface": [
+          {
+            "name": "subject",
+            "type": "any",
+            "label": "subject"
+          },
+          {
+            "name": "currentUnit",
+            "type": "any",
+            "label": "currentUnit"
+          },
+          {
+            "name": "newUnit",
+            "type": "any",
+            "label": "newUnit"
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "module": "builtin:BasicAggregator",
+      "version": 1,
+      "parameters": {
+        "feeder": 3
+      },
+      "mapper": {
+        "newUnit": "{{24.newUnit}}",
+        "subject": "{{24.subject}}",
+        "currentUnit": "{{24.currentUnit}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 898,
+          "y": 10
+        },
+        "restore": {
+          "extra": {
+            "feeder": {
+              "label": "Google Sheets - Get Range Values [3]"
+            },
+            "target": {
+              "label": "Custom"
+            }
+          }
+        },
+        "advanced": true
+      },
+      "flags": {
+        "stopIfEmpty": true
+      }
+    },
+    {
+      "id": 4,
+      "module": "google-sheets:getSheetContent",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "range": "A1:G13",
+        "select": "fromAll",
+        "sheetId": "달력",
+        "spreadsheetId": "{{2.id}}",
+        "includesHeaders": false,
+        "valueRenderOption": "FORMATTED_VALUE",
+        "dateTimeRenderOption": "FORMATTED_STRING"
+      },
+      "metadata": {
+        "designer": {
+          "x": 1207,
+          "y": 10
+        },
+        "restore": {
+          "expect": {
+            "select": {
+              "label": "Select from all"
+            },
+            "sheetId": {
+              "mode": "edit"
+            },
+            "includesHeaders": {
+              "mode": "chose"
+            },
+            "valueRenderOption": {
+              "mode": "chose",
+              "label": "Formatted value"
+            },
+            "dateTimeRenderOption": {
+              "mode": "chose",
+              "label": "Formatted string"
+            }
+          },
+          "parameters": {
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google"
+              },
+              "label": "REDACTED Google connection"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google",
+            "label": "Connection",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "select",
+            "type": "select",
+            "label": "Search Method",
+            "required": true,
+            "validate": {
+              "enum": [
+                "list",
+                "fromAll",
+                "map"
+              ]
+            }
+          },
+          {
+            "name": "range",
+            "type": "text",
+            "label": "Range",
+            "required": true
+          },
+          {
+            "name": "includesHeaders",
+            "type": "boolean",
+            "label": "Table contains headers",
+            "required": true
+          },
+          {
+            "name": "valueRenderOption",
+            "type": "select",
+            "label": "Value render option",
+            "validate": {
+              "enum": [
+                "FORMATTED_VALUE",
+                "UNFORMATTED_VALUE",
+                "FORMULA"
+              ]
+            }
+          },
+          {
+            "name": "dateTimeRenderOption",
+            "type": "select",
+            "label": "Date and time render option",
+            "validate": {
+              "enum": [
+                "SERIAL_NUMBER",
+                "FORMATTED_STRING"
+              ]
+            }
+          },
+          {
+            "name": "spreadsheetId",
+            "type": "text",
+            "label": "Spreadsheet ID",
+            "required": true
+          },
+          {
+            "mode": "edit",
+            "name": "sheetId",
+            "type": "select",
+            "label": "Sheet Name",
+            "required": true
+          }
+        ],
+        "interface": [
+          {
+            "name": "__ROW_NUMBER__",
+            "type": "number",
+            "label": "Row number"
+          },
+          {
+            "name": "__SPREADSHEET_ID__",
+            "type": "text",
+            "label": "Spreadsheet ID"
+          },
+          {
+            "name": "__SHEET__",
+            "type": "text",
+            "label": "Sheet"
+          },
+          {
+            "name": "0",
+            "type": "text",
+            "label": "A"
+          },
+          {
+            "name": "1",
+            "type": "text",
+            "label": "B"
+          },
+          {
+            "name": "2",
+            "type": "text",
+            "label": "C"
+          },
+          {
+            "name": "3",
+            "type": "text",
+            "label": "D"
+          },
+          {
+            "name": "4",
+            "type": "text",
+            "label": "E"
+          },
+          {
+            "name": "5",
+            "type": "text",
+            "label": "F"
+          },
+          {
+            "name": "6",
+            "type": "text",
+            "label": "G"
+          }
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "module": "util:TextAggregator",
+      "version": 1,
+      "parameters": {
+        "feeder": 4,
+        "rowSeparator": ""
+      },
+      "filter": {
+        "name": "달력 헤더 제외",
+        "conditions": [
+          [
+            {
+              "a": "{{4.`__ROW_NUMBER__`}}",
+              "b": "1",
+              "o": "text:notequal"
+            }
+          ]
+        ]
+      },
+      "mapper": {
+        "value": "{{4.`0`}}|||{{4.`1`}}|||{{4.`2`}}|||{{4.`3`}}|||{{4.`4`}}|||{{4.`5`}}|||{{4.`6`}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 1520,
+          "y": 13
+        },
+        "restore": {
+          "extra": {
+            "feeder": {
+              "label": "Google Sheets - Get Range Values [4]"
+            }
+          },
+          "parameters": {
+            "rowSeparator": {
+              "label": "Empty"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "rowSeparator",
+            "type": "select",
+            "label": "Row separator",
+            "validate": {
+              "enum": [
+                "\n",
+                "\t",
+                "other"
+              ]
+            }
+          }
+        ],
+        "expect": [
+          {
+            "name": "value",
+            "type": "text",
+            "label": "Text"
+          }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "module": "regexp:Parser",
+      "version": 1,
+      "parameters": {
+        "global": true,
+        "pattern": "(?<subject>단어|작문|독해|듣기)\\s+(?:(?<test>test)\\s*\\((?<testRange>[^)]+)\\)|(?<value>[0-9]+(?:-[0-9]+)?(?:\\s*,\\s*[0-9]+(?:-[0-9]+)?)*))(?:\\s*\\((?<status>학습시작|학습완료)\\))?",
+        "multiline": false,
+        "sensitive": true,
+        "singleline": false,
+        "continueWhenNoRes": true,
+        "ignoreInfiniteLoopsWhenGlobal": false
+      },
+      "mapper": {
+        "text": "{{15.text}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 1812,
+          "y": 6
+        },
+        "restore": {},
+        "parameters": [
+          {
+            "name": "pattern",
+            "type": "text",
+            "label": "Pattern",
+            "required": true
+          },
+          {
+            "name": "global",
+            "type": "boolean",
+            "label": "Global match",
+            "required": true
+          },
+          {
+            "name": "sensitive",
+            "type": "boolean",
+            "label": "Case sensitive",
+            "required": true
+          },
+          {
+            "name": "multiline",
+            "type": "boolean",
+            "label": "Multiline",
+            "required": true
+          },
+          {
+            "name": "singleline",
+            "type": "boolean",
+            "label": "Singleline",
+            "required": true
+          },
+          {
+            "name": "continueWhenNoRes",
+            "type": "boolean",
+            "label": "Continue the execution of the route even if the module finds no matches",
+            "required": true
+          },
+          {
+            "name": "ignoreInfiniteLoopsWhenGlobal",
+            "type": "boolean",
+            "label": "Ignore errors when there is an infinite search loop",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "text",
+            "type": "text",
+            "label": "Text"
+          }
+        ],
+        "interface": [
+          {
+            "name": "subject",
+            "type": "text",
+            "label": "subject"
+          },
+          {
+            "name": "test",
+            "type": "text",
+            "label": "test"
+          },
+          {
+            "name": "testRange",
+            "type": "text",
+            "label": "testRange"
+          },
+          {
+            "name": "value",
+            "type": "text",
+            "label": "value"
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "label": "status"
+          },
+          {
+            "name": "i",
+            "type": "uinteger",
+            "label": "i"
+          },
+          {
+            "name": "__IMTMATCH__",
+            "type": "any",
+            "label": "Fallback Match"
+          }
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "module": "builtin:BasicAggregator",
+      "version": 1,
+      "parameters": {
+        "feeder": 17
+      },
+      "mapper": {
+        "test": "{{17.test}}",
+        "value": "{{17.value}}",
+        "status": "{{17.status}}",
+        "subject": "{{17.subject}}",
+        "testRange": "{{17.testRange}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 2120,
+          "y": 11
+        },
+        "restore": {
+          "extra": {
+            "feeder": {
+              "label": "Text parser - Match pattern [17]"
+            },
+            "target": {
+              "label": "Custom"
+            }
+          }
+        },
+        "advanced": true
+      },
+      "flags": {
+        "groupBy": "{{17.subject}}",
+        "stopIfEmpty": true
+      }
+    },
+    {
+      "id": 19,
+      "module": "util:SetVariables",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "scope": "roundtrip",
+        "variables": [
+          {
+            "name": "values",
+            "value": "{{remove(map(18.array; \"value\"); null; emptystring)}}"
+          }
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 2432,
+          "y": 7
+        },
+        "restore": {
+          "expect": {
+            "scope": {
+              "label": "One cycle"
+            },
+            "variables": {
+              "items": [
+                null
+              ]
+            }
+          }
+        },
+        "expect": [
+          {
+            "name": "variables",
+            "spec": {
+              "name": "value",
+              "spec": [
+                {
+                  "name": "name",
+                  "type": "text",
+                  "label": "Variable name",
+                  "required": true
+                },
+                {
+                  "name": "value",
+                  "type": "any",
+                  "label": "Variable value"
+                }
+              ],
+              "type": "collection",
+              "label": "Variable"
+            },
+            "type": "array",
+            "label": "Variables",
+            "validate": {
+              "unique": {
+                "by": "name"
+              }
+            }
+          },
+          {
+            "name": "scope",
+            "type": "select",
+            "label": "Variable lifetime",
+            "required": true,
+            "validate": {
+              "enum": [
+                "roundtrip",
+                "execution"
+              ]
+            }
+          }
+        ],
+        "interface": [
+          {
+            "name": "values",
+            "type": "any",
+            "label": "values"
+          }
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "module": "util:SetVariables",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "scope": "roundtrip",
+        "variables": [
+          {
+            "name": "startValue",
+            "value": "{{first(split(first(19.values); \",\"))}}"
+          },
+          {
+            "name": "endValue",
+            "value": "{{last(split(last(19.values); \",\"))}}"
+          },
+          {
+            "name": "testCount",
+            "value": "{{length(remove(map(18.array; \"test\"); null; emptystring))}}"
+          },
+          {
+            "name": "completedValue",
+            "value": "{{first(map(18.array; \"value\"; \"status\"; \"학습완료\"))}}"
+          },
+          {
+            "name": "newStartValue",
+            "value": "{{first(map(18.array; \"value\"; \"status\"; \"학습시작\"))}}"
+          },
+          {
+            "name": "currentUnit",
+            "value": "{{first(map(10.array; \"currentUnit\"; \"subject\"; 18.`__IMTKEY__`))}}"
+          },
+          {
+            "name": "newUnit",
+            "value": "{{ifempty(first(map(10.array; \"newUnit\"; \"subject\"; 18.`__IMTKEY__`)); first(map(10.array; \"currentUnit\"; \"subject\"; 18.`__IMTKEY__`)))}}"
+          }
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 2731,
+          "y": 5
+        },
+        "restore": {
+          "expect": {
+            "scope": {
+              "label": "One cycle"
+            },
+            "variables": {
+              "items": [
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        },
+        "expect": [
+          {
+            "name": "variables",
+            "spec": {
+              "name": "value",
+              "spec": [
+                {
+                  "name": "name",
+                  "type": "text",
+                  "label": "Variable name",
+                  "required": true
+                },
+                {
+                  "name": "value",
+                  "type": "any",
+                  "label": "Variable value"
+                }
+              ],
+              "type": "collection",
+              "label": "Variable"
+            },
+            "type": "array",
+            "label": "Variables",
+            "validate": {
+              "unique": {
+                "by": "name"
+              }
+            }
+          },
+          {
+            "name": "scope",
+            "type": "select",
+            "label": "Variable lifetime",
+            "required": true,
+            "validate": {
+              "enum": [
+                "roundtrip",
+                "execution"
+              ]
+            }
+          }
+        ],
+        "interface": [
+          {
+            "name": "startValue",
+            "type": "any",
+            "label": "startValue"
+          },
+          {
+            "name": "endValue",
+            "type": "any",
+            "label": "endValue"
+          },
+          {
+            "name": "testCount",
+            "type": "any",
+            "label": "testCount"
+          },
+          {
+            "name": "completedValue",
+            "type": "any",
+            "label": "completedValue"
+          },
+          {
+            "name": "newStartValue",
+            "type": "any",
+            "label": "newStartValue"
+          },
+          {
+            "name": "currentUnit",
+            "type": "any",
+            "label": "currentUnit"
+          },
+          {
+            "name": "newUnit",
+            "type": "any",
+            "label": "newUnit"
+          }
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "module": "util:SetVariable2",
+      "version": 1,
+      "parameters": {},
+      "filter": null,
+      "mapper": {
+        "name": "newRangeText",
+        "scope": "roundtrip",
+        "value": "{{switch(21.newStartValue; 21.endValue; 21.newUnit + decodeURL(\"%20\") + 21.newStartValue; 21.newUnit + decodeURL(\"%20\") + 21.newStartValue + decodeURL(\"%20~%20\") + 21.newUnit + decodeURL(\"%20\") + 21.endValue)}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 3018,
+          "y": 18
+        },
+        "restore": {
+          "expect": {
+            "scope": {
+              "label": "One cycle"
+            }
+          }
+        },
+        "expect": [
+          {
+            "name": "name",
+            "type": "text",
+            "label": "Variable name",
+            "required": true
+          },
+          {
+            "name": "scope",
+            "type": "select",
+            "label": "Variable lifetime",
+            "required": true,
+            "validate": {
+              "enum": [
+                "roundtrip",
+                "execution"
+              ]
+            }
+          },
+          {
+            "name": "value",
+            "type": "any",
+            "label": "Variable value"
+          }
+        ],
+        "interface": [
+          {
+            "name": "newRangeText",
+            "type": "any",
+            "label": "newRangeText"
+          }
+        ]
+      }
+    },
+    {
+      "id": 31,
+      "module": "util:SetVariable2",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "name": "coreSummary",
+        "scope": "roundtrip",
+        "value": "{{switch(ifempty(21.completedValue; \"EMPTY\"); \"EMPTY\"; switch(ifempty(21.newStartValue; \"EMPTY\"); \"EMPTY\"; 21.currentUnit + decodeURL(\"%20\") + 21.startValue + decodeURL(\"%20~%20\") + 21.currentUnit + decodeURL(\"%20\") + 21.endValue; 28.newRangeText + decodeURL(\"%20%EC%8B%A0%EA%B7%9C%20%ED%95%99%EC%8A%B5%20%EC%8B%9C%EC%9E%91\")); 21.currentUnit + decodeURL(\"%20\") + 21.startValue + decodeURL(\"%20~%20\") + 21.currentUnit + decodeURL(\"%20\") + 21.completedValue + decodeURL(\"%20%EC%99%84%EB%A3%8C%2C%20%EC%83%88%20%EA%B5%90%EC%9E%AC%20\") + 28.newRangeText + decodeURL(\"%20%ED%95%99%EC%8A%B5%20%EC%8B%9C%EC%9E%91\"))}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 3325,
+          "y": 24
+        },
+        "restore": {
+          "expect": {
+            "scope": {
+              "label": "One cycle"
+            }
+          }
+        },
+        "expect": [
+          {
+            "name": "name",
+            "type": "text",
+            "label": "Variable name",
+            "required": true
+          },
+          {
+            "name": "scope",
+            "type": "select",
+            "label": "Variable lifetime",
+            "required": true,
+            "validate": {
+              "enum": [
+                "roundtrip",
+                "execution"
+              ]
+            }
+          },
+          {
+            "name": "value",
+            "type": "any",
+            "label": "Variable value"
+          }
+        ],
+        "interface": [
+          {
+            "name": "coreSummary",
+            "type": "any",
+            "label": "coreSummary"
+          }
+        ]
+      }
+    },
+    {
+      "id": 32,
+      "module": "util:SetVariable2",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "name": "finalSummary",
+        "scope": "roundtrip",
+        "value": "{{switch(21.testCount; 0; 31.coreSummary; 31.coreSummary + decodeURL(\"%20%28%ED%85%8C%EC%8A%A4%ED%8A%B8%20\") + 21.testCount + decodeURL(\"%ED%9A%8C%29\"))}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 3625,
+          "y": 24
+        },
+        "restore": {
+          "expect": {
+            "scope": {
+              "label": "One cycle"
+            }
+          }
+        },
+        "expect": [
+          {
+            "name": "name",
+            "type": "text",
+            "label": "Variable name",
+            "required": true
+          },
+          {
+            "name": "scope",
+            "type": "select",
+            "label": "Variable lifetime",
+            "required": true,
+            "validate": {
+              "enum": [
+                "roundtrip",
+                "execution"
+              ]
+            }
+          },
+          {
+            "name": "value",
+            "type": "any",
+            "label": "Variable value"
+          }
+        ],
+        "interface": [
+          {
+            "name": "finalSummary",
+            "type": "any",
+            "label": "finalSummary"
+          }
+        ]
+      }
+    },
+    {
+      "id": 33,
+      "module": "builtin:BasicAggregator",
+      "version": 1,
+      "parameters": {
+        "feeder": 18
+      },
+      "mapper": {
+        "__IMTKEY__": "{{18.`__IMTKEY__`}}",
+        "finalSummary": "{{32.finalSummary}}"
+      },
+      "metadata": {
+        "designer": {
+          "x": 3925,
+          "y": 24
+        },
+        "restore": {
+          "extra": {
+            "feeder": {
+              "label": "Array aggregator [18]"
+            },
+            "target": {
+              "label": "Custom"
+            }
+          }
+        },
+        "advanced": true
+      },
+      "flags": {
+        "stopIfEmpty": true
+      }
+    },
+    {
+      "id": 34,
+      "module": "util:SetVariables",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "scope": "roundtrip",
+        "variables": [
+          {
+            "name": "wordSummary",
+            "value": "{{first(map(33.array; \"finalSummary\"; \"__IMTKEY__\"; decodeURL(\"%EB%8B%A8%EC%96%B4\")))}}"
+          },
+          {
+            "name": "writingSummary",
+            "value": "{{first(map(33.array; \"finalSummary\"; \"__IMTKEY__\"; decodeURL(\"%EC%9E%91%EB%AC%B8\")))}}"
+          },
+          {
+            "name": "listeningSummary",
+            "value": "{{first(map(33.array; \"finalSummary\"; \"__IMTKEY__\"; decodeURL(\"%EB%93%A3%EA%B8%B0\")))}}"
+          },
+          {
+            "name": "readingSummary",
+            "value": "{{first(map(33.array; \"finalSummary\"; \"__IMTKEY__\"; decodeURL(\"%EB%8F%85%ED%95%B4\")))}}"
+          }
+        ]
+      },
+      "metadata": {
+        "designer": {
+          "x": 4225,
+          "y": 24
+        },
+        "restore": {
+          "expect": {
+            "scope": {
+              "label": "One cycle"
+            },
+            "variables": {
+              "items": [
+                null,
+                null,
+                null,
+                null
+              ]
+            }
+          }
+        },
+        "expect": [
+          {
+            "name": "variables",
+            "spec": {
+              "name": "value",
+              "spec": [
+                {
+                  "name": "name",
+                  "type": "text",
+                  "label": "Variable name",
+                  "required": true
+                },
+                {
+                  "name": "value",
+                  "type": "any",
+                  "label": "Variable value"
+                }
+              ],
+              "type": "collection",
+              "label": "Variable"
+            },
+            "type": "array",
+            "label": "Variables",
+            "validate": {
+              "unique": {
+                "by": "name"
+              }
+            }
+          },
+          {
+            "name": "scope",
+            "type": "select",
+            "label": "Variable lifetime",
+            "required": true,
+            "validate": {
+              "enum": [
+                "roundtrip",
+                "execution"
+              ]
+            }
+          }
+        ],
+        "interface": [
+          {
+            "name": "wordSummary",
+            "type": "any",
+            "label": "wordSummary"
+          },
+          {
+            "name": "writingSummary",
+            "type": "any",
+            "label": "writingSummary"
+          },
+          {
+            "name": "listeningSummary",
+            "type": "any",
+            "label": "listeningSummary"
+          },
+          {
+            "name": "readingSummary",
+            "type": "any",
+            "label": "readingSummary"
+          }
+        ]
+      }
+    },
+    {
+      "id": 38,
+      "module": "google-sheets:getSheetContent",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "range": "A2:BH2",
+        "select": "map",
+        "sheetId": "정보",
+        "spreadsheetId": "{{2.id}}",
+        "tableFirstRow": "1",
+        "includesHeaders": true,
+        "valueRenderOption": "FORMATTED_VALUE",
+        "dateTimeRenderOption": "FORMATTED_STRING"
+      },
+      "metadata": {
+        "designer": {
+          "x": 4525,
+          "y": 24
+        },
+        "restore": {
+          "expect": {
+            "select": {
+              "label": "Enter manually"
+            },
+            "includesHeaders": {
+              "mode": "chose"
+            },
+            "valueRenderOption": {
+              "mode": "chose",
+              "label": "Formatted value"
+            },
+            "dateTimeRenderOption": {
+              "mode": "chose",
+              "label": "Formatted string"
+            }
+          },
+          "parameters": {
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google"
+              },
+              "label": "REDACTED Google connection"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google",
+            "label": "Connection",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "select",
+            "type": "select",
+            "label": "Search Method",
+            "required": true,
+            "validate": {
+              "enum": [
+                "list",
+                "fromAll",
+                "map"
+              ]
+            }
+          },
+          {
+            "name": "range",
+            "type": "text",
+            "label": "Range",
+            "required": true
+          },
+          {
+            "name": "includesHeaders",
+            "type": "boolean",
+            "label": "Table contains headers",
+            "required": true
+          },
+          {
+            "name": "valueRenderOption",
+            "type": "select",
+            "label": "Value render option",
+            "validate": {
+              "enum": [
+                "FORMATTED_VALUE",
+                "UNFORMATTED_VALUE",
+                "FORMULA"
+              ]
+            }
+          },
+          {
+            "name": "dateTimeRenderOption",
+            "type": "select",
+            "label": "Date and time render option",
+            "validate": {
+              "enum": [
+                "SERIAL_NUMBER",
+                "FORMATTED_STRING"
+              ]
+            }
+          },
+          {
+            "name": "spreadsheetId",
+            "type": "text",
+            "label": "Spreadsheet ID",
+            "required": true
+          },
+          {
+            "name": "sheetId",
+            "type": "text",
+            "label": "Sheet Name",
+            "required": true
+          },
+          {
+            "name": "tableFirstRow",
+            "type": "text",
+            "label": "Row with headers"
+          }
+        ]
+      }
+    },
+    {
+      "id": 39,
+      "module": "gemini-ai:simpleTextPrompt",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "model": "gemini-2.5-flash",
+        "textPrompt": "당신은 영어전문학원의 월간 학습레포트 총평을 작성하는 선생님입니다.\n아래 데이터를 바탕으로 기존 학원 총평의 문체와 구성에 맞게 작성하세요.\n\n[학생]\n이름: {{38.`1`}}\n학교/학년: {{38.`2`}}\n\n[학습량]\n단어: {{38.`12`}}회\n작문: {{38.`13`}}회\n듣기: {{38.`14`}}회\n독해: {{38.`15`}}회\n\n[이번 달 학습 범위]\n단어: {{34.wordSummary}}\n작문: {{34.writingSummary}}\n듣기: {{34.listeningSummary}}\n독해: {{34.readingSummary}}\n\n[교재]\n{{38.`11`}}\n\n[작성 원칙]\n- 300~450자 정도로 작성한다.\n- 2~4개의 번호 문단으로 구성한다. 예: 1) ... 2) ... 3) ...\n- 학생 이름은 성을 제외한 이름으로 자연스럽게 부른다.\n- 모든 과목을 억지로 나열하지 말고, 이번 달에 변화가 있거나 의미 있는 1~3개 영역을 중심으로 쓴다.\n- '학습완료 → 새 교재 학습시작'이 있으면 가장 중요한 변화로 다룬다.\n- 새 교재가 시작된 과목은 이전 학습에서 다음 단계로 자연스럽게 이어지고 있다는 흐름으로 설명한다.\n- 교재 변경이 없다면 현재 진행 중인 주요 학습과 그 학습이 길러주는 능력을 중심으로 설명한다.\n- 단어는 어휘의 폭과 독해·영작의 기반, 독해는 문장/글의 의미와 흐름 파악, 작문은 문장 구조 이해와 직접 표현, 듣기는 영어 소리와 듣고 이해하는 능력의 관점에서 자연스럽게 설명할 수 있다.\n- 중학생은 필요할 경우 문장 구조, 구문, 문법, 독해, 서술형 등 중등 영어의 기본기와 연결한다.\n- 초등학생은 기초, 문장 구조, 어휘와 표현, 읽기·듣기·쓰기의 기본기를 중심으로 설명한다.\n- 제공된 정보에 없는 시험 결과, 성적, 수업 태도, 방학 계획, 학교 일정은 절대 만들어내지 않는다.\n- 교재명만 보고 구체적인 단원 내용이나 문법 항목을 임의로 추측하지 않는다.\n- 학습 횟수는 참고자료로 활용하되 숫자를 단순 나열하지 않는다.\n- 지나친 칭찬이나 평가보다 차분하고 객관적인 학원 선생님 문체를 사용한다.\n- 마지막은 앞으로의 학습 방향과 지도 계획으로 자연스럽게 마무리한다.\n- 제목, 인사말, '총평:' 같은 표시는 출력하지 않는다.\n- 1), 2), 3) 각 번호 문단 사이에는 반드시 줄바꿈을 1번 넣는다.\n[문체 강제 규칙]\n- 전체 문체는 차분하고 담백하게 작성한다. 학생을 칭찬하거나 성과를 강조하기 위한 과장된 수식어를 사용하지 않는다.\n- 학습 기록에 나타난 사실을 중심으로 설명하고, 그 학습이 어떤 영어 능력과 연결되는지를 간단히 설명한다.\n- 교재를 완료하거나 새 교재를 시작한 사실 자체를 특별한 성취처럼 과장하지 않는다.\n- \"괄목할 만한\", \"눈에 띄는\", \"놀라운\", \"뛰어난\", \"탁월한\", \"큰 발전\", \"한 단계 발전한\", \"성공적으로\", \"탄탄하게\", \"견고하게\", \"유기적으로\", \"완벽하게\", \"확실하게\"와 같은 과장되거나 평가적인 표현은 사용하지 않는다.\n- \"능력을 크게 향상시켰습니다\", \"괄목할 만한 진전을 보였습니다\"처럼 성과를 단정하기보다 \"연습을 이어가고 있습니다\", \"익혀가고 있습니다\", \"학습하고 있습니다\", \"기본기를 쌓아가고 있습니다\"처럼 과정 중심으로 표현한다.\n- 같은 의미의 칭찬이나 학습 효과를 반복하지 않는다.\n- 각 문장은 필요한 정보만 전달하고 지나치게 장황하게 설명하지 않는다.\n- 교재명은 필요한 경우에만 언급하며, 같은 교재명을 한 총평에서 반복하지 않는다.\n- 마지막 문장은 \"앞으로도 ~할 수 있도록 지도하겠습니다\" 정도의 간결한 표현으로 마무리하고, \"지속적으로 세심한 지도를 이어가겠습니다\"처럼 과도하게 꾸미지 않는다.\n\n[문체 예시 1 - 초등 / 새 교재 전환]\n입력 상황: 독해 새 교재 시작, 듣기 기존 교재 완료 후 새 교재 시작.\n출력 예시:\n1) 민수는 최근 독해와 듣기 영역에서 새로운 단계의 학습을 시작하며 영어 학습의 범위를 조금씩 넓혀가고 있습니다. 독해에서는 새로운 교재를 통해 짧은 글을 읽고 문장의 의미와 흐름을 이해하는 연습을 이어가고 있습니다.\n2) 듣기에서는 이전 교재 학습을 마무리하고 다음 단계로 넘어가 영어 문장을 듣고 이해하는 연습을 꾸준히 진행하고 있습니다.\n3) 앞으로도 새롭게 배우는 내용을 안정적으로 익히며 영어의 기본기를 차근차근 쌓아갈 수 있도록 지도하겠습니다.\n\n[문체 예시 2 - 초등 / 교재 전환 없이 진행]\n입력 상황: 영작과 문법 학습을 지속 중.\n출력 예시:\n1) 서연이는 현재 영작 학습을 통해 영어 문장의 기본 구조를 이해하고 직접 문장을 만들어 보는 연습을 꾸준히 이어가고 있습니다.\n2) 문법 학습도 함께 진행하며 문장 속에서 필요한 기본 개념을 익히고, 배운 내용을 영작에 자연스럽게 연결하는 힘을 키워가고 있습니다.\n3) 앞으로도 각 영역에서 익힌 내용을 서로 연결해 활용하며 영어 문장의 기본기를 탄탄하게 다질 수 있도록 꾸준히 지도하겠습니다.\n\n[문체 예시 3 - 중등 / 다음 단계로 확장]\n입력 상황: 기존 교재 완료 후 새로운 구문·독해 단계 시작.\n출력 예시:\n1) 현우는 최근 기존 학습을 마무리하고 다음 단계의 교재를 시작하며 중등 영어 학습의 범위를 넓혀가고 있습니다. 새 과정에서는 다양한 문장 구조를 접하며 문장을 정확하게 이해하고 해석하는 연습을 이어가고 있습니다.\n2) 독해에서도 새로운 단계의 지문을 읽으며 글의 중심 내용과 흐름을 파악하는 힘을 차근차근 키워가고 있습니다.\n3) 앞으로도 지금까지 익힌 기본 내용을 새로운 학습과 자연스럽게 연결하며 중등 영어의 기본기를 더욱 안정적으로 쌓아갈 수 있도록 지도하겠습니다.\n\n이제 위 학생의 실제 데이터에 대한 총평 본문만 작성하세요.\n출력 전에 과장된 칭찬, 불필요한 수식어, 근거 없는 성취 평가가 포함되어 있는지 확인하고, 있다면 담백한 표현으로 수정한 뒤 출력하세요."
+      },
+      "metadata": {
+        "designer": {
+          "x": 4825,
+          "y": 24
+        },
+        "restore": {
+          "expect": {
+            "model": {
+              "label": "Gemini 2.5 FlashApplies smart reasoning to fast data tasks while ensuring quick response times"
+            }
+          }
+        },
+        "expect": [
+          {
+            "name": "model",
+            "type": "select",
+            "label": "Model",
+            "required": true,
+            "validate": {
+              "enum": [
+                "gemini-2.5-flash",
+                "gemini-3.7-flash",
+                "gemini-3.6-flash",
+                "gemini-3.5-flash",
+                "gemini-3.1-pro-preview",
+                "gemini-3-flash-preview",
+                "gemini-2.5-pro"
+              ]
+            }
+          },
+          {
+            "name": "textPrompt",
+            "type": "text",
+            "label": "Text prompt",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": 40,
+      "module": "google-slides:createPresentation",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 0
+      },
+      "mapper": {
+        "from": "drive",
+        "title": "{{38.`0`}}_{{38.`1`}}_학습레포트",
+        "select": "value",
+        "shared": false,
+        "folderId": "/REDACTED_OUTPUT_FOLDER_ID",
+        "requests": {
+          "D1": "{{38.`18`}}",
+          "D2": "{{38.`19`}}",
+          "D3": "{{38.`20`}}",
+          "D4": "{{38.`21`}}",
+          "D5": "{{38.`22`}}",
+          "D6": "{{38.`23`}}",
+          "D7": "{{38.`24`}}",
+          "D8": "{{38.`25`}}",
+          "D9": "{{38.`26`}}",
+          "D10": "{{38.`27`}}",
+          "D11": "{{38.`28`}}",
+          "D12": "{{38.`29`}}",
+          "D13": "{{38.`30`}}",
+          "D14": "{{38.`31`}}",
+          "D15": "{{38.`32`}}",
+          "D16": "{{38.`33`}}",
+          "D17": "{{38.`34`}}",
+          "D18": "{{38.`35`}}",
+          "D19": "{{38.`36`}}",
+          "D20": "{{38.`37`}}",
+          "D21": "{{38.`38`}}",
+          "D22": "{{38.`39`}}",
+          "D23": "{{38.`40`}}",
+          "D24": "{{38.`41`}}",
+          "D25": "{{38.`42`}}",
+          "D26": "{{38.`43`}}",
+          "D27": "{{38.`44`}}",
+          "D28": "{{38.`45`}}",
+          "D29": "{{38.`46`}}",
+          "D30": "{{38.`47`}}",
+          "D31": "{{38.`48`}}",
+          "D32": "{{38.`49`}}",
+          "D33": "{{38.`50`}}",
+          "D34": "{{38.`51`}}",
+          "D35": "{{38.`52`}}",
+          "D36": "{{38.`53`}}",
+          "D37": "{{38.`54`}}",
+          "D38": "{{38.`55`}}",
+          "D39": "{{38.`56`}}",
+          "D40": "{{38.`57`}}",
+          "D41": "{{38.`58`}}",
+          "D42": "{{38.`59`}}",
+          "COMMENT": "{{39.result}}",
+          "BOOK_INFO": "{{38.`11`}}",
+          "WORD_COUNT": "{{38.`12`}}",
+          "TOTAL_COUNT": "{{38.`16`}}",
+          "REPORT_MONTH": "{{38.`0`}}",
+          "SCHOOL_GRADE": "{{38.`2`}}",
+          "STUDENT_NAME": "{{38.`1`}}",
+          "WORD_SUMMARY": "{{34.wordSummary}}",
+          "READING_COUNT": "{{38.`15`}}",
+          "SUBJECT_COUNT": "{{38.`17`}}",
+          "WRITING_COUNT": "{{38.`13`}}",
+          "LISTENING_COUNT": "{{38.`14`}}",
+          "READING_SUMMARY": "{{34.readingSummary}}",
+          "WRITING_SUMMARY": "{{34.writingSummary}}",
+          "LISTENING_SUMMARY": "{{34.listeningSummary}}"
+        },
+        "destination": "drive",
+        "presentation": "/REDACTED_GOOGLE_SLIDES_TEMPLATE_ID"
+      },
+      "metadata": {
+        "designer": {
+          "x": 5125,
+          "y": 24
+        },
+        "restore": {
+          "expect": {
+            "from": {
+              "label": "My Drive"
+            },
+            "select": {
+              "label": "By Dropdown"
+            },
+            "shared": {
+              "mode": "chose"
+            },
+            "folderId": {
+              "mode": "chose",
+              "path": [
+                "학습 레포트"
+              ]
+            },
+            "destination": {
+              "label": "My Drive"
+            },
+            "presentation": {
+              "path": [
+                "학습레포트 템플릿"
+              ]
+            }
+          },
+          "parameters": {
+            "__IMTCONN__": {
+              "data": {
+                "scoped": "true",
+                "connection": "google"
+              },
+              "label": "REDACTED Google connection"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "__IMTCONN__",
+            "type": "account:google",
+            "label": "Connection",
+            "required": true
+          }
+        ],
+        "expect": [
+          {
+            "name": "title",
+            "type": "text",
+            "label": "Title",
+            "required": true
+          },
+          {
+            "name": "select",
+            "type": "select",
+            "label": "Copy a Presentation",
+            "required": true,
+            "validate": {
+              "enum": [
+                "map",
+                "value"
+              ]
+            }
+          },
+          {
+            "name": "destination",
+            "type": "select",
+            "label": "New Drive Location",
+            "required": true,
+            "validate": {
+              "enum": [
+                "drive",
+                "share",
+                "team"
+              ]
+            }
+          },
+          {
+            "name": "shared",
+            "type": "boolean",
+            "label": "Shared",
+            "required": true
+          },
+          {
+            "name": "from",
+            "type": "select",
+            "label": "Choose a Drive",
+            "required": true,
+            "validate": {
+              "enum": [
+                "drive",
+                "share",
+                "team"
+              ]
+            }
+          },
+          {
+            "name": "presentation",
+            "type": "file",
+            "label": "Presentation ID",
+            "required": true
+          },
+          {
+            "name": "requests",
+            "spec": [
+              {
+                "name": "REPORT_MONTH",
+                "type": "text"
+              },
+              {
+                "name": "STUDENT_NAME",
+                "type": "text"
+              },
+              {
+                "name": "SCHOOL_GRADE",
+                "type": "text"
+              },
+              {
+                "name": "SUBJECT_COUNT",
+                "type": "text"
+              },
+              {
+                "name": "TOTAL_COUNT",
+                "type": "text"
+              },
+              {
+                "name": "TOTAL_COUNT",
+                "type": "text"
+              },
+              {
+                "name": "WORD_COUNT",
+                "type": "text"
+              },
+              {
+                "name": "LISTENING_COUNT",
+                "type": "text"
+              },
+              {
+                "name": "WRITING_COUNT",
+                "type": "text"
+              },
+              {
+                "name": "READING_COUNT",
+                "type": "text"
+              },
+              {
+                "name": "WORD_SUMMARY",
+                "type": "text"
+              },
+              {
+                "name": "LISTENING_SUMMARY",
+                "type": "text"
+              },
+              {
+                "name": "WRITING_SUMMARY",
+                "type": "text"
+              },
+              {
+                "name": "READING_SUMMARY",
+                "type": "text"
+              },
+              {
+                "name": "STUDENT_NAME",
+                "type": "text"
+              },
+              {
+                "name": "SCHOOL_GRADE",
+                "type": "text"
+              },
+              {
+                "name": "BOOK_INFO",
+                "type": "text"
+              },
+              {
+                "name": "COMMENT",
+                "type": "text"
+              },
+              {
+                "name": "D1",
+                "type": "text"
+              },
+              {
+                "name": "D2",
+                "type": "text"
+              },
+              {
+                "name": "D3",
+                "type": "text"
+              },
+              {
+                "name": "D4",
+                "type": "text"
+              },
+              {
+                "name": "D5",
+                "type": "text"
+              },
+              {
+                "name": "D6",
+                "type": "text"
+              },
+              {
+                "name": "D7",
+                "type": "text"
+              },
+              {
+                "name": "D8",
+                "type": "text"
+              },
+              {
+                "name": "D9",
+                "type": "text"
+              },
+              {
+                "name": "D10",
+                "type": "text"
+              },
+              {
+                "name": "D11",
+                "type": "text"
+              },
+              {
+                "name": "D12",
+                "type": "text"
+              },
+              {
+                "name": "D13",
+                "type": "text"
+              },
+              {
+                "name": "D14",
+                "type": "text"
+              },
+              {
+                "name": "D15",
+                "type": "text"
+              },
+              {
+                "name": "D22",
+                "type": "text"
+              },
+              {
+                "name": "D29",
+                "type": "text"
+              },
+              {
+                "name": "D36",
+                "type": "text"
+              },
+              {
+                "name": "D16",
+                "type": "text"
+              },
+              {
+                "name": "D17",
+                "type": "text"
+              },
+              {
+                "name": "D18",
+                "type": "text"
+              },
+              {
+                "name": "D19",
+                "type": "text"
+              },
+              {
+                "name": "D20",
+                "type": "text"
+              },
+              {
+                "name": "D21",
+                "type": "text"
+              },
+              {
+                "name": "D23",
+                "type": "text"
+              },
+              {
+                "name": "D28",
+                "type": "text"
+              },
+              {
+                "name": "D30",
+                "type": "text"
+              },
+              {
+                "name": "D35",
+                "type": "text"
+              },
+              {
+                "name": "D37",
+                "type": "text"
+              },
+              {
+                "name": "D42",
+                "type": "text"
+              },
+              {
+                "name": "D24",
+                "type": "text"
+              },
+              {
+                "name": "D25",
+                "type": "text"
+              },
+              {
+                "name": "D26",
+                "type": "text"
+              },
+              {
+                "name": "D27",
+                "type": "text"
+              },
+              {
+                "name": "D33",
+                "type": "text"
+              },
+              {
+                "name": "D31",
+                "type": "text"
+              },
+              {
+                "name": "D32",
+                "type": "text"
+              },
+              {
+                "name": "D38",
+                "type": "text"
+              },
+              {
+                "name": "D39",
+                "type": "text"
+              },
+              {
+                "name": "D34",
+                "type": "text"
+              },
+              {
+                "name": "D40",
+                "type": "text"
+              },
+              {
+                "name": "D41",
+                "type": "text"
+              }
+            ],
+            "type": "collection",
+            "label": "Values"
+          },
+          {
+            "name": "folderId",
+            "type": "folder",
+            "label": "New Document's Location"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 1,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "slots": null,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "REDACTED_MAKE_ZONE",
+    "notes": []
+  }
+}

@@ -1,0 +1,822 @@
+{
+  "name": "월간 학습레포트 자동 생성",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "blogUrl": "",
+  "metadata": {
+    "externalId": "REDACTED_ACTIVEPIECES_EXTERNAL_ID"
+  },
+  "author": "REDACTED_AUTHOR",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-google-drive",
+    "@activepieces/piece-flow-helper",
+    "@activepieces/piece-google-sheets",
+    "@activepieces/piece-google-gemini",
+    "@activepieces/piece-google-slides"
+  ],
+  "flows": [
+    {
+      "displayName": "월간 학습레포트 자동 생성",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "New File",
+        "nextAction": {
+          "name": "step_9",
+          "skip": false,
+          "type": "ROUTER",
+          "valid": true,
+          "children": [
+            null,
+            {
+              "name": "step_10",
+              "skip": false,
+              "type": "PIECE",
+              "valid": true,
+              "settings": {
+                "input": {},
+                "pieceName": "@activepieces/piece-flow-helper",
+                "actionName": "stopFlow",
+                "pieceVersion": "0.1.8",
+                "propertySettings": {},
+                "errorHandlingOptions": {
+                  "retryOnFailure": {
+                    "value": false
+                  },
+                  "continueOnFailure": {
+                    "value": false
+                  }
+                }
+              },
+              "displayName": "Stop Flow",
+              "lastUpdatedDate": "2026-08-30T03:19:16.938Z"
+            }
+          ],
+          "settings": {
+            "branches": [
+              {
+                "branchName": "Branch 1",
+                "branchType": "CONDITION",
+                "conditions": [
+                  [
+                    {
+                      "operator": "TEXT_EXACTLY_MATCHES",
+                      "firstValue": "{{trigger['output']['mimeType']}}",
+                      "secondValue": "application/vnd.google-apps.spreadsheet",
+                      "caseSensitive": false
+                    }
+                  ]
+                ]
+              },
+              {
+                "branchName": "Otherwise",
+                "branchType": "FALLBACK"
+              }
+            ],
+            "sampleData": {},
+            "executionType": "EXECUTE_FIRST_MATCH"
+          },
+          "nextAction": {
+            "name": "step_1",
+            "skip": false,
+            "type": "PIECE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "auth": "{{connections['REDACTED_CONNECTION_1']}}",
+                "range": "A2:C5",
+                "sheetId": "REDACTED_SHEET_TAB_ID",
+                "spreadsheetId": "{{trigger['output']['id']}}",
+                "majorDimension": "ROWS",
+                "includeTeamDrives": false,
+                "valueRenderOption": "FORMATTED_VALUE"
+              },
+              "pieceName": "@activepieces/piece-google-sheets",
+              "actionName": "read-data-range",
+              "sampleData": {},
+              "pieceVersion": "0.16.9",
+              "propertySettings": {
+                "range": {
+                  "type": "MANUAL"
+                },
+                "sheetId": {
+                  "type": "DYNAMIC"
+                },
+                "spreadsheetId": {
+                  "type": "DYNAMIC"
+                },
+                "majorDimension": {
+                  "type": "MANUAL"
+                },
+                "includeTeamDrives": {
+                  "type": "MANUAL"
+                },
+                "valueRenderOption": {
+                  "type": "MANUAL"
+                }
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
+              }
+            },
+            "nextAction": {
+              "name": "step_2",
+              "skip": false,
+              "type": "PIECE",
+              "valid": true,
+              "settings": {
+                "input": {
+                  "auth": "{{connections['REDACTED_CONNECTION_1']}}",
+                  "range": "A1:G13",
+                  "sheetId": "REDACTED_SHEET_TAB_ID",
+                  "spreadsheetId": "{{trigger['output']['id']}}",
+                  "majorDimension": "ROWS",
+                  "includeTeamDrives": false,
+                  "valueRenderOption": "FORMATTED_VALUE"
+                },
+                "pieceName": "@activepieces/piece-google-sheets",
+                "actionName": "read-data-range",
+                "sampleData": {},
+                "pieceVersion": "0.16.9",
+                "propertySettings": {
+                  "range": {
+                    "type": "MANUAL"
+                  },
+                  "sheetId": {
+                    "type": "DYNAMIC"
+                  },
+                  "spreadsheetId": {
+                    "type": "DYNAMIC"
+                  },
+                  "majorDimension": {
+                    "type": "MANUAL"
+                  },
+                  "includeTeamDrives": {
+                    "type": "MANUAL"
+                  },
+                  "valueRenderOption": {
+                    "type": "MANUAL"
+                  }
+                },
+                "errorHandlingOptions": {
+                  "retryOnFailure": {
+                    "value": false
+                  },
+                  "continueOnFailure": {
+                    "value": false
+                  }
+                }
+              },
+              "nextAction": {
+                "name": "step_3",
+                "skip": false,
+                "type": "CODE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "calendarRows": "{{step_2['output']['values']}}",
+                    "settingsRows": "{{step_1['output']['values']}}"
+                  },
+                  "sampleData": {},
+                  "sourceCode": {
+                    "code": "export const code = async (inputs) => {\n  const settingsRows = Array.isArray(inputs.settingsRows) ? inputs.settingsRows : [];\n  const calendarRows = Array.isArray(inputs.calendarRows) ? inputs.calendarRows : [];\n\n  const units = {};\n  for (const row of settingsRows) {\n    const subject = String(row?.[0] ?? \"\").trim();\n    if (!subject) continue;\n    const currentUnit = String(row?.[1] ?? \"\").trim();\n    const newUnitRaw = String(row?.[2] ?? \"\").trim();\n    units[subject] = {\n      currentUnit,\n      newUnit: newUnitRaw || currentUnit,\n    };\n  }\n\n  const calendarText = calendarRows\n    .slice(1)\n    .map((row) =>\n      Array.from({ length: 7 }, (_, i) => String(row?.[i] ?? \"\")).join(\"|||\")\n    )\n    .join(\"\");\n\n  const pattern = /(?<subject>단어|작문|독해|듣기)\\s+(?:(?<test>test)\\s*\\((?<testRange>[^)]+)\\)|(?<value>[0-9]+(?:-[0-9]+)?(?:\\s*,\\s*[0-9]+(?:-[0-9]+)?)*))(?:\\s*\\((?<status>학습시작|학습완료)\\))?/g;\n\n  const grouped = { 단어: [], 작문: [], 듣기: [], 독해: [] };\n  let match;\n  while ((match = pattern.exec(calendarText)) !== null) {\n    const g = match.groups || {};\n    if (grouped[g.subject]) {\n      grouped[g.subject].push({\n        value: g.value || \"\",\n        test: g.test || \"\",\n        testRange: g.testRange || \"\",\n        status: g.status || \"\",\n      });\n    }\n  }\n\n  const summarize = (subject) => {\n    const entries = grouped[subject] || [];\n    const values = entries.map((x) => x.value).filter((x) => x !== \"\");\n    const startValue = values.length\n      ? values[0].split(\",\")[0].trim()\n      : \"\";\n    const endValue = values.length\n      ? values[values.length - 1].split(\",\").pop().trim()\n      : \"\";\n    const testCount = entries.filter((x) => x.test !== \"\").length;\n    const completedValue =\n      entries.find((x) => x.status === \"학습완료\" && x.value)?.value || \"\";\n    const newStartValue =\n      entries.find((x) => x.status === \"학습시작\" && x.value)?.value || \"\";\n    const currentUnit = units[subject]?.currentUnit || \"\";\n    const newUnit = units[subject]?.newUnit || currentUnit;\n\n    const newRangeText =\n      newStartValue === endValue\n        ? newUnit + \" \" + newStartValue\n        : newUnit + \" \" + newStartValue + \" ~ \" + newUnit + \" \" + endValue;\n\n    let coreSummary;\n    if (!completedValue) {\n      if (!newStartValue) {\n        coreSummary =\n          currentUnit + \" \" + startValue + \" ~ \" + currentUnit + \" \" + endValue;\n      } else {\n        coreSummary = newRangeText + \" 신규 학습 시작\";\n      }\n    } else {\n      coreSummary =\n        currentUnit +\n        \" \" +\n        startValue +\n        \" ~ \" +\n        currentUnit +\n        \" \" +\n        completedValue +\n        \" 완료, 새 교재 \" +\n        newRangeText +\n        \" 학습 시작\";\n    }\n\n    return testCount === 0\n      ? coreSummary\n      : coreSummary + \" (테스트 \" + testCount + \"회)\";\n  };\n\n  return {\n    wordSummary: summarize(\"단어\"),\n    writingSummary: summarize(\"작문\"),\n    listeningSummary: summarize(\"듣기\"),\n    readingSummary: summarize(\"독해\"),\n  };\n};",
+                    "packageJson": "{}"
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
+                  }
+                },
+                "nextAction": {
+                  "name": "step_4",
+                  "skip": false,
+                  "type": "PIECE",
+                  "valid": true,
+                  "settings": {
+                    "input": {
+                      "auth": "{{connections['REDACTED_CONNECTION_1']}}",
+                      "range": "A2:BH2",
+                      "sheetId": "REDACTED_SHEET_TAB_ID",
+                      "spreadsheetId": "{{trigger['output']['id']}}",
+                      "majorDimension": "ROWS",
+                      "includeTeamDrives": false,
+                      "valueRenderOption": "FORMATTED_VALUE"
+                    },
+                    "pieceName": "@activepieces/piece-google-sheets",
+                    "actionName": "read-data-range",
+                    "sampleData": {},
+                    "pieceVersion": "0.16.9",
+                    "propertySettings": {
+                      "range": {
+                        "type": "MANUAL"
+                      },
+                      "sheetId": {
+                        "type": "DYNAMIC"
+                      },
+                      "spreadsheetId": {
+                        "type": "DYNAMIC"
+                      },
+                      "majorDimension": {
+                        "type": "MANUAL"
+                      },
+                      "includeTeamDrives": {
+                        "type": "MANUAL"
+                      },
+                      "valueRenderOption": {
+                        "type": "MANUAL"
+                      }
+                    },
+                    "errorHandlingOptions": {
+                      "retryOnFailure": {
+                        "value": false
+                      },
+                      "continueOnFailure": {
+                        "value": false
+                      }
+                    }
+                  },
+                  "nextAction": {
+                    "name": "step_6",
+                    "skip": false,
+                    "type": "PIECE",
+                    "valid": true,
+                    "settings": {
+                      "input": {
+                        "auth": "{{connections['REDACTED_CONNECTION_2']}}",
+                        "model": "gemini-3.6-flash",
+                        "prompt": "당신은 영어전문학원의 월간 학습레포트 총평을 작성하는 선생님입니다.\n아래 데이터를 바탕으로 기존 학원 총평의 문체와 구성에 맞게 작성하세요.\n[학생]\n이름: {{step_4['output']['values'][0][1]}}\n학교/학년: {{step_4['output']['values'][0][2]}}\n[학습량]\n단어: {{step_4['output']['values'][0][12]}}회\n작문: {{step_4['output']['values'][0][13]}}회\n듣기: {{step_4['output']['values'][0][14]}}회\n독해: {{step_4['output']['values'][0][15]}}회\n[이번 달 학습 범위]\n단어: {{step_3['output']['wordSummary']}}\n작문: {{step_3['output']['writingSummary']}}\n듣기: {{step_3['output']['listeningSummary']}}\n독해: {{step_3['output']['readingSummary']}}\n[교재]\n{{step_4['output']['values'][0][11]}}\n[작성 원칙]\n- 300~450자 정도로 작성한다.\n- 2~4개의 번호 문단으로 구성한다. 예: 1) ... 2) ... 3) ...\n- 학생 이름은 성을 제외한 이름으로 자연스럽게 부른다.\n- 모든 과목을 억지로 나열하지 말고, 이번 달에 변화가 있거나 의미 있는 1~3개 영역을 중심으로 쓴다.\n- '학습완료 → 새 교재 학습시작'이 있으면 가장 중요한 변화로 다룬다.\n- 새 교재가 시작된 과목은 이전 학습에서 다음 단계로 자연스럽게 이어지고 있다는 흐름으로 설명한다.\n- 교재 변경이 없다면 현재 진행 중인 주요 학습과 그 학습이 길러주는 능력을 중심으로 설명한다.\n- 단어는 어휘의 폭과 독해·영작의 기반, 독해는 문장/글의 의미와 흐름 파악, 작문은 문장 구조 이해와 직접 표현, 듣기는 영어 소리와 듣고 이해하는 능력의 관점에서 자연스럽게 설명할 수 있다.\n- 중학생은 필요할 경우 문장 구조, 구문, 문법, 독해, 서술형 등 중등 영어의 기본기와 연결한다.\n- 초등학생은 기초, 문장 구조, 어휘와 표현, 읽기·듣기·쓰기의 기본기를 중심으로 설명한다.\n- 제공된 정보에 없는 시험 결과, 성적, 수업 태도, 방학 계획, 학교 일정은 절대 만들어내지 않는다.\n- 교재명만 보고 구체적인 단원 내용이나 문법 항목을 임의로 추측하지 않는다.\n- 학습 횟수는 참고자료로 활용하되 숫자를 단순 나열하지 않는다.\n- 지나친 칭찬이나 평가보다 차분하고 객관적인 학원 선생님 문체를 사용한다.\n- 마지막은 앞으로의 학습 방향과 지도 계획으로 자연스럽게 마무리한다.\n- 제목, 인사말, '총평:' 같은 표시는 출력하지 않는다.\n- 1), 2), 3) 각 번호 문단 사이에는 반드시 줄바꿈을 1번 넣는다.\n[문체 강제 규칙]\n- 전체 문체는 차분하고 담백하게 작성한다. 학생을 칭찬하거나 성과를 강조하기 위한 과장된 수식어를 사용하지 않는다.\n- 학습 기록에 나타난 사실을 중심으로 설명하고, 그 학습이 어떤 영어 능력과 연결되는지를 간단히 설명한다.\n- 교재를 완료하거나 새 교재를 시작한 사실 자체를 특별한 성취처럼 과장하지 않는다.\n- \"괄목할 만한\", \"눈에 띄는\", \"놀라운\", \"뛰어난\", \"탁월한\", \"큰 발전\", \"한 단계 발전한\", \"성공적으로\", \"탄탄하게\", \"견고하게\", \"유기적으로\", \"완벽하게\", \"확실하게\"와 같은 과장되거나 평가적인 표현은 사용하지 않는다.\n- \"능력을 크게 향상시켰습니다\", \"괄목할 만한 진전을 보였습니다\"처럼 성과를 단정하기보다 \"연습을 이어가고 있습니다\", \"익혀가고 있습니다\", \"학습하고 있습니다\", \"기본기를 쌓아가고 있습니다\"처럼 과정 중심으로 표현한다.\n- 같은 의미의 칭찬이나 학습 효과를 반복하지 않는다.\n- 각 문장은 필요한 정보만 전달하고 지나치게 장황하게 설명하지 않는다.\n- 교재명은 필요한 경우에만 언급하며, 같은 교재명을 한 총평에서 반복하지 않는다.\n- 마지막 문장은 \"앞으로도 ~할 수 있도록 지도하겠습니다\" 정도의 간결한 표현으로 마무리하고, \"지속적으로 세심한 지도를 이어가겠습니다\"처럼 과도하게 꾸미지 않는다.\n[문체 예시 1 - 초등 / 새 교재 전환]\n입력 상황: 독해 새 교재 시작, 듣기 기존 교재 완료 후 새 교재 시작.\n출력 예시:\n1) 민수는 최근 독해와 듣기 영역에서 새로운 단계의 학습을 시작하며 영어 학습의 범위를 조금씩 넓혀가고 있습니다. 독해에서는 새로운 교재를 통해 짧은 글을 읽고 문장의 의미와 흐름을 이해하는 연습을 이어가고 있습니다.\n2) 듣기에서는 이전 교재 학습을 마무리하고 다음 단계로 넘어가 영어 문장을 듣고 이해하는 연습을 꾸준히 진행하고 있습니다.\n3) 앞으로도 새롭게 배우는 내용을 안정적으로 익히며 영어의 기본기를 차근차근 쌓아갈 수 있도록 지도하겠습니다.\n[문체 예시 2 - 초등 / 교재 전환 없이 진행]\n입력 상황: 영작과 문법 학습을 지속 중.\n출력 예시:\n1) 서연이는 현재 영작 학습을 통해 영어 문장의 기본 구조를 이해하고 직접 문장을 만들어 보는 연습을 꾸준히 이어가고 있습니다.\n2) 문법 학습도 함께 진행하며 문장 속에서 필요한 기본 개념을 익히고, 배운 내용을 영작에 자연스럽게 연결하는 힘을 키워가고 있습니다.\n3) 앞으로도 각 영역에서 익힌 내용을 서로 연결해 활용하며 영어 문장의 기본기를 탄탄하게 다질 수 있도록 꾸준히 지도하겠습니다.\n[문체 예시 3 - 중등 / 다음 단계로 확장]\n입력 상황: 기존 교재 완료 후 새로운 구문·독해 단계 시작.\n출력 예시:\n1) 현우는 최근 기존 학습을 마무리하고 다음 단계의 교재를 시작하며 중등 영어 학습의 범위를 넓혀가고 있습니다. 새 과정에서는 다양한 문장 구조를 접하며 문장을 정확하게 이해하고 해석하는 연습을 이어가고 있습니다.\n2) 독해에서도 새로운 단계의 지문을 읽으며 글의 중심 내용과 흐름을 파악하는 힘을 차근차근 키워가고 있습니다.\n3) 앞으로도 지금까지 익힌 기본 내용을 새로운 학습과 자연스럽게 연결하며 중등 영어의 기본기를 더욱 안정적으로 쌓아갈 수 있도록 지도하겠습니다.\n이제 위 학생의 실제 데이터에 대한 총평 본문만 작성하세요.\n출력 전에 과장된 칭찬, 불필요한 수식어, 근거 없는 성취 평가가 포함되어 있는지 확인하고, 있다면 담백한 표현으로 수정한 뒤 출력하세요."
+                      },
+                      "pieceName": "@activepieces/piece-google-gemini",
+                      "actionName": "chat_gemini",
+                      "sampleData": {},
+                      "pieceVersion": "0.1.16",
+                      "propertySettings": {
+                        "model": {
+                          "type": "DYNAMIC"
+                        },
+                        "prompt": {
+                          "type": "MANUAL"
+                        },
+                        "memoryKey": {
+                          "type": "MANUAL"
+                        }
+                      },
+                      "errorHandlingOptions": {
+                        "retryOnFailure": {
+                          "value": false
+                        },
+                        "continueOnFailure": {
+                          "value": false
+                        }
+                      }
+                    },
+                    "nextAction": {
+                      "name": "step_7",
+                      "skip": false,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "auth": "{{connections['REDACTED_CONNECTION_3']}}",
+                          "table_data": {
+                            "D1": "{{step_4['output']['values'][0][18]}}",
+                            "D2": "{{step_4['output']['values'][0][19]}}",
+                            "D3": "{{step_4['output']['values'][0][20]}}",
+                            "D4": "{{step_4['output']['values'][0][21]}}",
+                            "D5": "{{step_4['output']['values'][0][22]}}",
+                            "D6": "{{step_4['output']['values'][0][23]}}",
+                            "D7": "{{step_4['output']['values'][0][24]}}",
+                            "D8": "{{step_4['output']['values'][0][25]}}",
+                            "D9": "{{step_4['output']['values'][0][26]}}",
+                            "D10": "{{step_4['output']['values'][0][27]}}",
+                            "D11": "{{step_4['output']['values'][0][28]}}",
+                            "D12": "{{step_4['output']['values'][0][29]}}",
+                            "D13": "{{step_4['output']['values'][0][30]}}",
+                            "D14": "{{step_4['output']['values'][0][31]}}",
+                            "D15": "{{step_4['output']['values'][0][32]}}",
+                            "D16": "{{step_4['output']['values'][0][33]}}",
+                            "D17": "{{step_4['output']['values'][0][34]}}",
+                            "D18": "{{step_4['output']['values'][0][35]}}",
+                            "D19": "{{step_4['output']['values'][0][36]}}",
+                            "D20": "{{step_4['output']['values'][0][37]}}",
+                            "D21": "{{step_4['output']['values'][0][38]}}",
+                            "D22": "{{step_4['output']['values'][0][39]}}",
+                            "D23": "{{step_4['output']['values'][0][40]}}",
+                            "D24": "{{step_4['output']['values'][0][41]}}",
+                            "D25": "{{step_4['output']['values'][0][42]}}",
+                            "D26": "{{step_4['output']['values'][0][43]}}",
+                            "D27": "{{step_4['output']['values'][0][44]}}",
+                            "D28": "{{step_4['output']['values'][0][45]}}",
+                            "D29": "{{step_4['output']['values'][0][46]}}",
+                            "D30": "{{step_4['output']['values'][0][47]}}",
+                            "D31": "{{step_4['output']['values'][0][48]}}",
+                            "D32": "{{step_4['output']['values'][0][49]}}",
+                            "D33": "{{step_4['output']['values'][0][50]}}",
+                            "D34": "{{step_4['output']['values'][0][51]}}",
+                            "D35": "{{step_4['output']['values'][0][52]}}",
+                            "D36": "{{step_4['output']['values'][0][53]}}",
+                            "D37": "{{step_4['output']['values'][0][54]}}",
+                            "D38": "{{step_4['output']['values'][0][55]}}",
+                            "D39": "{{step_4['output']['values'][0][56]}}",
+                            "D40": "{{step_4['output']['values'][0][57]}}",
+                            "D41": "{{step_4['output']['values'][0][58]}}",
+                            "D42": "{{step_4['output']['values'][0][59]}}",
+                            "title": "{{step_4['output']['values'][0][0]}}_{{step_4['output']['values'][0][1]}}_학습레포트",
+                            "COMMENT": "{{step_6['output']['response']}}",
+                            "BOOK_INFO": "{{step_4['output']['values'][0][11]}}",
+                            "WORD_COUNT": "{{step_4['output']['values'][0][12]}}",
+                            "TOTAL_COUNT": "{{step_4['output']['values'][0][16]}}",
+                            "REPORT_MONTH": "{{step_4['output']['values'][0][0]}}",
+                            "SCHOOL_GRADE": "{{step_4['output']['values'][0][2]}}",
+                            "STUDENT_NAME": "{{step_4['output']['values'][0][1]}}",
+                            "WORD_SUMMARY": "{{step_3['output']['wordSummary']}}",
+                            "READING_COUNT": "{{step_4['output']['values'][0][15]}}",
+                            "SUBJECT_COUNT": "{{step_4['output']['values'][0][17]}}",
+                            "WRITING_COUNT": "{{step_4['output']['values'][0][13]}}",
+                            "LISTENING_COUNT": "{{step_4['output']['values'][0][14]}}",
+                            "READING_SUMMARY": "{{step_3['output']['readingSummary']}}",
+                            "WRITING_SUMMARY": "{{step_3['output']['writingSummary']}}",
+                            "LISTENING_SUMMARY": "{{step_3['output']['listeningSummary']}}"
+                          },
+                          "placeholder_format": "{{}}",
+                          "template_presentation_id": "REDACTED_GOOGLE_SLIDES_TEMPLATE_ID"
+                        },
+                        "pieceName": "@activepieces/piece-google-slides",
+                        "actionName": "generate_from_template",
+                        "sampleData": {},
+                        "pieceVersion": "0.1.11",
+                        "propertySettings": {
+                          "table_data": {
+                            "type": "MANUAL",
+                            "schema": {
+                              "D1": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D1}}\"",
+                                "displayName": "D1"
+                              },
+                              "D2": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D2}}\"",
+                                "displayName": "D2"
+                              },
+                              "D3": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D3}}\"",
+                                "displayName": "D3"
+                              },
+                              "D4": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D4}}\"",
+                                "displayName": "D4"
+                              },
+                              "D5": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D5}}\"",
+                                "displayName": "D5"
+                              },
+                              "D6": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D6}}\"",
+                                "displayName": "D6"
+                              },
+                              "D7": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D7}}\"",
+                                "displayName": "D7"
+                              },
+                              "D8": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D8}}\"",
+                                "displayName": "D8"
+                              },
+                              "D9": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D9}}\"",
+                                "displayName": "D9"
+                              },
+                              "D10": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D10}}\"",
+                                "displayName": "D10"
+                              },
+                              "D11": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D11}}\"",
+                                "displayName": "D11"
+                              },
+                              "D12": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D12}}\"",
+                                "displayName": "D12"
+                              },
+                              "D13": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D13}}\"",
+                                "displayName": "D13"
+                              },
+                              "D14": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D14}}\"",
+                                "displayName": "D14"
+                              },
+                              "D15": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D15}}\"",
+                                "displayName": "D15"
+                              },
+                              "D16": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D16}}\"",
+                                "displayName": "D16"
+                              },
+                              "D17": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D17}}\"",
+                                "displayName": "D17"
+                              },
+                              "D18": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D18}}\"",
+                                "displayName": "D18"
+                              },
+                              "D19": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D19}}\"",
+                                "displayName": "D19"
+                              },
+                              "D20": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D20}}\"",
+                                "displayName": "D20"
+                              },
+                              "D21": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D21}}\"",
+                                "displayName": "D21"
+                              },
+                              "D22": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D22}}\"",
+                                "displayName": "D22"
+                              },
+                              "D23": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D23}}\"",
+                                "displayName": "D23"
+                              },
+                              "D24": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D24}}\"",
+                                "displayName": "D24"
+                              },
+                              "D25": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D25}}\"",
+                                "displayName": "D25"
+                              },
+                              "D26": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D26}}\"",
+                                "displayName": "D26"
+                              },
+                              "D27": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D27}}\"",
+                                "displayName": "D27"
+                              },
+                              "D28": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D28}}\"",
+                                "displayName": "D28"
+                              },
+                              "D29": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D29}}\"",
+                                "displayName": "D29"
+                              },
+                              "D30": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D30}}\"",
+                                "displayName": "D30"
+                              },
+                              "D31": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D31}}\"",
+                                "displayName": "D31"
+                              },
+                              "D32": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D32}}\"",
+                                "displayName": "D32"
+                              },
+                              "D33": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D33}}\"",
+                                "displayName": "D33"
+                              },
+                              "D34": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D34}}\"",
+                                "displayName": "D34"
+                              },
+                              "D35": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D35}}\"",
+                                "displayName": "D35"
+                              },
+                              "D36": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D36}}\"",
+                                "displayName": "D36"
+                              },
+                              "D37": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D37}}\"",
+                                "displayName": "D37"
+                              },
+                              "D38": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D38}}\"",
+                                "displayName": "D38"
+                              },
+                              "D39": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D39}}\"",
+                                "displayName": "D39"
+                              },
+                              "D40": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D40}}\"",
+                                "displayName": "D40"
+                              },
+                              "D41": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D41}}\"",
+                                "displayName": "D41"
+                              },
+                              "D42": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{D42}}\"",
+                                "displayName": "D42"
+                              },
+                              "title": {
+                                "type": "SHORT_TEXT",
+                                "required": true,
+                                "description": "Title of the new presentation",
+                                "displayName": "Presentation Title",
+                                "defaultValue": "Copy of: 학습레포트 템플릿"
+                              },
+                              "COMMENT": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{COMMENT}}\"",
+                                "displayName": "COMMENT"
+                              },
+                              "BOOK_INFO": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{BOOK_INFO}}\"",
+                                "displayName": "BOOK INFO"
+                              },
+                              "WORD_COUNT": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{WORD_COUNT}}\"",
+                                "displayName": "WORD COUNT"
+                              },
+                              "TOTAL_COUNT": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{TOTAL_COUNT}}\"",
+                                "displayName": "TOTAL COUNT"
+                              },
+                              "REPORT_MONTH": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{REPORT_MONTH}}\"",
+                                "displayName": "REPORT MONTH"
+                              },
+                              "SCHOOL_GRADE": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{SCHOOL_GRADE}}\"",
+                                "displayName": "SCHOOL GRADE"
+                              },
+                              "STUDENT_NAME": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{STUDENT_NAME}}\"",
+                                "displayName": "STUDENT NAME"
+                              },
+                              "WORD_SUMMARY": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{WORD_SUMMARY}}\"",
+                                "displayName": "WORD SUMMARY"
+                              },
+                              "READING_COUNT": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{READING_COUNT}}\"",
+                                "displayName": "READING COUNT"
+                              },
+                              "SUBJECT_COUNT": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{SUBJECT_COUNT}}\"",
+                                "displayName": "SUBJECT COUNT"
+                              },
+                              "WRITING_COUNT": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{WRITING_COUNT}}\"",
+                                "displayName": "WRITING COUNT"
+                              },
+                              "LISTENING_COUNT": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{LISTENING_COUNT}}\"",
+                                "displayName": "LISTENING COUNT"
+                              },
+                              "READING_SUMMARY": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{READING_SUMMARY}}\"",
+                                "displayName": "READING SUMMARY"
+                              },
+                              "WRITING_SUMMARY": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{WRITING_SUMMARY}}\"",
+                                "displayName": "WRITING SUMMARY"
+                              },
+                              "LISTENING_SUMMARY": {
+                                "type": "SHORT_TEXT",
+                                "required": false,
+                                "description": "Value for \"{{LISTENING_SUMMARY}}\"",
+                                "displayName": "LISTENING SUMMARY"
+                              }
+                            }
+                          },
+                          "placeholder_format": {
+                            "type": "MANUAL"
+                          },
+                          "template_presentation_id": {
+                            "type": "MANUAL"
+                          }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
+                        }
+                      },
+                      "nextAction": {
+                        "name": "step_8",
+                        "skip": false,
+                        "type": "PIECE",
+                        "valid": true,
+                        "settings": {
+                          "input": {
+                            "auth": "{{connections['REDACTED_CONNECTION_4']}}",
+                            "fileId": "{{step_7['output']['presentationId']}}",
+                            "folderId": "REDACTED_OUTPUT_FOLDER_ID",
+                            "include_team_drives": false
+                          },
+                          "pieceName": "@activepieces/piece-google-drive",
+                          "actionName": "google-drive-move-file",
+                          "pieceVersion": "0.9.1",
+                          "propertySettings": {
+                            "fileId": {
+                              "type": "MANUAL"
+                            },
+                            "folderId": {
+                              "type": "DYNAMIC"
+                            },
+                            "include_team_drives": {
+                              "type": "MANUAL"
+                            }
+                          },
+                          "errorHandlingOptions": {
+                            "retryOnFailure": {
+                              "value": false
+                            },
+                            "continueOnFailure": {
+                              "value": false
+                            }
+                          }
+                        },
+                        "displayName": "Move File",
+                        "lastUpdatedDate": "2026-08-30T03:19:16.939Z"
+                      },
+                      "displayName": "Generate from template",
+                      "lastUpdatedDate": "2026-08-30T03:19:16.938Z"
+                    },
+                    "displayName": "Chat Gemini",
+                    "lastUpdatedDate": "2026-08-30T04:01:25.416Z"
+                  },
+                  "displayName": "Read Data Range",
+                  "lastUpdatedDate": "2026-08-30T03:39:41.056Z"
+                },
+                "displayName": "Code",
+                "lastUpdatedDate": "2026-08-30T03:19:16.938Z"
+              },
+              "displayName": "Read Data Range",
+              "lastUpdatedDate": "2026-08-30T03:26:01.471Z"
+            },
+            "displayName": "Read Data Range",
+            "lastUpdatedDate": "2026-08-30T03:25:24.453Z"
+          },
+          "displayName": "Router",
+          "lastUpdatedDate": "2026-08-30T03:19:16.938Z"
+        },
+        "lastUpdatedDate": "2026-08-30T03:19:16.937Z",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "sampleData": {},
+          "propertySettings": {
+            "parentFolder": {
+              "type": "MANUAL"
+            },
+            "include_team_drives": {
+              "type": "MANUAL"
+            },
+            "include_file_content": {
+              "type": "MANUAL"
+            }
+          },
+          "pieceName": "@activepieces/piece-google-drive",
+          "pieceVersion": "0.9.1",
+          "triggerName": "new_file",
+          "input": {
+            "auth": "{{connections['REDACTED_CONNECTION_4']}}",
+            "parentFolder": "REDACTED_INPUT_FOLDER_ID",
+            "include_team_drives": false,
+            "include_file_content": false
+          }
+        }
+      },
+      "valid": true,
+      "schemaVersion": "24",
+      "notes": []
+    }
+  ],
+  "status": "PUBLISHED"
+}
