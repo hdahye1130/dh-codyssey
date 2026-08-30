@@ -49,7 +49,7 @@ Google Slides 템플릿의 placeholder 치환
 
 ### 워크플로우 구성 화면
 
-![Make 전체 워크플로우](assets/make-workflow.png)
+![Make 전체 워크플로우](make-workflow.png)
 
 Make에서는 Google Drive Trigger 이후 Google Sheets, Tools, Array Aggregator, Text Parser 등을 조합하여 데이터를 단계적으로 처리했다.
 
@@ -69,7 +69,7 @@ Make에서는 Google Drive Trigger 이후 Google Sheets, Tools, Array Aggregator
 
 ### 워크플로우 구성 화면
 
-![Activepieces 전체 워크플로우](assets/activepieces-workflow.png)
+![Activepieces 전체 워크플로우](activepieces-workflow.png)
 
 Activepieces에서는 다음과 같은 구조로 구현했다.
 
@@ -119,7 +119,7 @@ Router는 입력된 파일을 두 경로로 나눈다.
 
 ### 결과물 1페이지
 
-![월간 학습레포트 1페이지](assets/monthly-report-page1.png)
+![월간 학습레포트 1페이지](monthly-report-page1.png)
 
 1페이지에는 다음 정보가 자동으로 반영된다.
 
@@ -132,7 +132,7 @@ Router는 입력된 파일을 두 경로로 나눈다.
 
 ### 결과물 2페이지
 
-![월간 학습레포트 2페이지](assets/monthly-report-page2.png)
+![월간 학습레포트 2페이지](monthly-report-page2.png)
 
 2페이지에는 다음 정보가 자동으로 반영된다.
 
